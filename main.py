@@ -33,7 +33,7 @@ def chunk_text(text, max_chars):
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # Read input text from file
-input_file_path = "poem.txt"  # Replace with your text file path
+input_file_path = "ch_0_Edward_Robert_American_Journey.txt"  # Replace with your text file path
 input_path = Path(input_file_path)
 base_name = input_path.stem  # Gets filename without extension
 
