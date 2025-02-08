@@ -32,16 +32,21 @@ def chunk_text(text, max_chars):
 # Initialize client with API key from environment variables
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-# Sample input text (you can replace this with your own text)
-input_text = """Today is a wonderful day to build something people love! 
-Here is a much longer text that we want to process and convert to speech."""
+# Read input text from file
+input_file_path = "poem.txt"  # Replace with your text file path
+input_path = Path(input_file_path)
+base_name = input_path.stem  # Gets filename without extension
+
+# Read the file
+with open(input_file_path, 'r', encoding='utf-8') as file:
+    input_text = file.read()
 
 # Split text into chunks
 text_chunks = chunk_text(input_text, MAX_CHARACTERS)
 
 # Create audio files for each chunk
 for i, chunk in enumerate(text_chunks):
-    speech_file_path = Path(__file__).parent / f"speech_{i+1}.mp3"
+    speech_file_path = Path(__file__).parent / f"{base_name}_{i+1}.mp3"
     response = client.audio.speech.create(
         model="tts-1",
         voice="onyx",
