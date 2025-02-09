@@ -55,6 +55,11 @@
             <button onclick="previousImage()">Previous</button>
             <button onclick="nextImage()">Next</button>
         </div>
+        <div class="audio-controls">
+            <button onclick="previousAudio()">Previous Audio</button>
+            <button onclick="toggleAudio()" id="toggleButton">Play/Pause</button>
+            <button onclick="nextAudio()">Next Audio</button>
+        </div>
     </div>
 
     <script>
@@ -129,6 +134,55 @@
 
         // Load first image when page loads
         window.onload = updateImage;
+
+        const mp3_paths = [
+            "./audio/ch_1_Edward_Robert_American_Journey_1.mp3",
+            "./audio/ch_1_Edward_Robert_American_Journey_2.mp3"
+        ];
+
+        let currentAudioIndex = 0;
+        const audio = new Audio();
+
+        // Add error handling for audio
+        audio.onerror = function() {
+            console.error('Error loading audio file:', audio.src);
+        };
+
+        function playAudio() {
+            audio.src = mp3_paths[currentAudioIndex];
+            audio.play().catch(e => console.error('Error playing audio:', e));
+        }
+
+        function nextAudio() {
+            if (currentAudioIndex < mp3_paths.length - 1) {
+                currentAudioIndex++;
+                audio.src = mp3_paths[currentAudioIndex];
+                audio.play();
+            }
+        }
+
+        function previousAudio() {
+            if (currentAudioIndex > 0) {
+                currentAudioIndex--;
+                audio.src = mp3_paths[currentAudioIndex];
+                audio.play();
+            }
+        }
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        // Combined initialization function
+        window.onload = function() {
+            updateImage();
+            playAudio();
+        };
+
     </script>
 </body>
 </html>
