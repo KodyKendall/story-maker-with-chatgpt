@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edward & Robert's Story</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .image-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px 0;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .audio-controls {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+        .audio-title {
+            font-weight: bold;
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .progress-container {
+            margin: 15px 0;
+        }
+        .seek-bar {
+            width: 100%;
+            height: 5px;
+            margin: 10px 0;
+        }
+        .time-display {
+            font-size: 14px;
+            color: #666;
+            text-align: right;
+        }
+        .audio-text {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="title" id="title"></div>
+        <div class="description" id="description"></div>
+        <img id="storyImage" src="" alt="">
+        <div class="navigation">
+            <button onclick="previousImage()">Previous</button>
+            <button onclick="nextImage()">Next</button>
+        </div>
+        <div class="audio-controls">
+            <button onclick="previousAudio()">Previous Audio</button>
+            <button onclick="toggleAudio()" id="toggleButton">Play/Pause</button>
+            <button onclick="nextAudio()">Next Audio</button>
+            <div id="audioTitle" class="audio-title"></div>
+            <div class="progress-container">
+                <input type="range" id="seekBar" value="0" class="seek-bar">
+                <div class="time-display">
+                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                </div>
+            </div>
+            <div id="audioText" class="audio-text"></div>
+        </div>
+    </div>
+
+    <script>
+    images = [
+        {
+            "chunkIndex": 1,
+            "title": "San Francisco Contrasts",
+            "description": "An expansive view of 1995 San Francisco\u2019s urban landscape, featuring steep streets with clattering cable cars juxtaposed against cracked sidewalks and glittering skyscrapers. This image should capture the tension between the city\u2019s aging infrastructure and its grand, ambitious skyline.",
+            "style": "Vivid, cinematic with a nostalgic tone",
+            "image_url": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/images/raw_images/ch_1_1.jpg"
+        },
+        {
+            "chunkIndex": 2,
+            "title": "Tech Beginnings in a Cramped Room",
+            "description": "A detailed depiction of Marcus Stevens in his cramped bedroom-turned-office. The scene shows him surrounded by tangled cables, a bulky US Robotics 28.8K modem, and a glowing CRT monitor casting an eerie blue light on his face as he eagerly awaits his modem\u2019s connection.",
+            "style": "Retro 90s tech aesthetic with warm yet muted lighting",
+            "image_url": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/images/raw_images/ch_1_2.jpg"
+        },
+        {
+            "chunkIndex": 3,
+            "title": "A City of Contrasts",
+            "description": "An image of Marcus stepping out into the vibrant streets of the Mission District. The scene should display an eclectic mix of architecture\u2014a rickety Victorian house beside a modern condo, an old bakery adjacent to a trendy pop-up caf\u00e9\u2014emphasizing the blend of old-world charm and modern energy.",
+            "style": "Dynamic street photography style with rich urban details",
+            "image_url": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/images/raw_images/ch_1_3.jpg"
+        },
+        {
+            "chunkIndex": 4,
+            "title": "The Shared Workspace",
+            "description": "Illustrate the exterior and interior of an old warehouse building converted into a shared office space. Include large metal doors, a cluster of worn bicycles, and walls decorated with tech meetup posters in multiple languages, conveying a gritty yet hopeful startup atmosphere.",
+            "style": "Realistic and grunge urban with a touch of industrial decay",
+            "image_url": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/images/raw_images/ch_1_4.jpg"
+        },
+        {
+            "chunkIndex": 5,
+            "title": "The Loft That Never Slept",
+            "description": "Inside a second-floor startup loft, show Marcus and his co-founder Priya deeply engaged in their work. The room should feature creaky wooden steps, scattered tech paraphernalia, a hint of lingering coffee and pizza smells, and computer screens displaying lines of code, capturing the midnight oil and raw energy of a 90s tech startup.",
+            "style": "Gritty, retro-cyber aesthetic with warm, intimate lighting",
+            "image_url": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/images/raw_images/ch_1_5.jpg"
+        },
+        {
+            "chunkIndex": 6,
+            "title": "From Dial-Up to the Future",
+            "description": "Create a split-scene montage that juxtaposes a nostalgic college computer lab with bulky PCs and an iconic dial-up modem against an abstract vision of a futuristic, interconnected digital world. This image should symbolize the leap from constrained, efficient coding to a boundless digital revolution.",
+            "style": "Surreal, with a blend of muted nostalgic elements and vibrant futuristic cues",
+            "image_url": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/images/raw_images/ch_1_6.jpg"
+        },
+        {
+            "chunkIndex": 7,
+            "title": "Tech Meetup Energy",
+            "description": "Depict a dimly lit bar near Union Square transformed into an impromptu tech meetup venue. Capture scrappy entrepreneurs at rickety tables, laptops open amidst scattered notes, and a probing magazine writer in the background, all set against the backdrop of stale beer and raw, vibrant ambition.",
+            "style": "Noir-inspired with a vintage film feel and atmospheric shadows",
+            "image_url": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/images/raw_images/ch_1_7.jpg"
+        },
+        {
+            "chunkIndex": 8,
+            "title": "Midnight in the Fog",
+            "description": "Show Marcus and Priya walking side-by-side through a fog-enshrouded San Francisco night. The image should include rolling fog, diffused streetlights, and a distant city skyline, embodying the mix of danger, uncertainty, and the infinite possibilities of their tech journey.",
+            "style": "Moody, cinematic, and atmospheric with a focus on silhouettes and soft glows",
+            "image_url": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/images/raw_images/ch_1_8.jpg"
+        }
+    ];
+
+        let currentIndex = 0;
+
+        function updateImage() {
+            const current = images[currentIndex];
+            document.getElementById('title').textContent = current.title;
+            document.getElementById('description').textContent = current.description;
+            document.getElementById('storyImage').src = current.image_url;
+        }
+
+        function nextImage() {
+            if (currentIndex < images.length - 1) {
+                currentIndex++;
+                updateImage();
+            }
+        }
+
+        function previousImage() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateImage();
+            }
+        }
+
+        // Load first image when page loads
+        window.onload = updateImage;
+
+        // const mp3_paths = [
+        //     "./audio/ch_1_Edward_Robert_American_Journey_1.mp3",
+        //     "./audio/ch_1_Edward_Robert_American_Journey_2.mp3"
+        // ];
+
+        const audio_paths = [
+  {
+    "audio_file": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/audio/ch_1_90s_Founder_in_SF_1.mp3",
+    "text": "Chapter 1: Silicon Dreams and Skyscrapers San Francisco in 1995 was a tapestry of contradictions. Cable cars clattered merrily up and down steep streets while, behind the closed doors of South of Market lofts, the beginnings of the internet age were quietly taking shape. Cracked sidewalks and glittering skyscrapers served as a vivid metaphor for the kind of precarious hope that pulsed through the city: things were being built fast\u2014sometimes on shaky foundations, but always with grand ambition. In a cramped bedroom-turned-office at the edge of the Mission District, Marcus Stevens was wrestling with a tangle of cables and his brand-new US Robotics 28.8K modem. He was a freshly minted computer science graduate with lofty plans for a software startup\u2014plans that would, at least in his mind, reshuffle the world of technology. The fluorescent glow of his clunky CRT monitor lit his features in an eerie blue, revealing equal parts excitement and exhaustion. \u201cCome on, come on,\u201d he muttered, tapping an impatient rhythm on the battered plastic desk. Finally, the modem screeched to life. A bizarre, half-electronic squawk filled the room, as though an angry robot had discovered a bee in its circuits. Marcus grinned. For all its demonic chatter, that noise heralded a gateway to the World Wide Web, the new frontier that every techie seemed obsessed with. If the web was a gold mine, Marcus intended to stake his claim. The connection established, he hurriedly opened his dusty web browser. Mosaic was still the talk of the computer labs when he graduated last year, but now everyone he knew was gushing about Netscape. Even brand-new software arrived at his apartment on 3.5-inch floppies and, occasionally, on CD-ROMs he\u2019d meticulously organize in a shoebox. Still, to him, it felt like the future. A future he desperately wanted to shape. A City of Contrasts Marcus needed to clear his head. Nothing facilitated a mental reboot like stepping into the open air of the Mission, where the hiss of bus brakes blended with Latin music pouring from corner stores. He shrugged on a battered leather jacket\u2014one that had seen him through all-nighters in his college dorm\u2014and headed out onto the sidewalk. Heading north toward Market Street, every block was a new scene. The only consistent theme was change. A rickety Victorian house next to a sparkling new condo development, a decades-old bakery next to a pop-up caf\u00e9 catering to hip young professionals. San Francisco in the mid-\u201990s was an intersection of the old guard and the new wave, and every day, the tectonic plates of culture and technology rumbled against each other. It wasn\u2019t a long walk to the old warehouse building that housed the shared office space Marcus rented by the month. Stepping through the large metal doors, he passed a collection of battered bicycles, a chorus of conversation in half a dozen languages, and posters advertising tech meetups scrawled with a black marker. The sense of camaraderie here was palpable, despite the obviously competitive aura that hung in the air. Everyone was chasing the next big idea, but they were also eager to swap knowledge\u2014at least the basics. Maybe we can all succeed together, was the unspoken hope, even if it was laced with the excitement of competition. The Loft That Never Slept Marcus\u2019s shared office suite was on the second floor, up creaky wooden steps. The hallway smelled of black coffee and cold pizza, the startup perfume of the mid-\u201990s. He unlocked the door to find his friend and newly minted co-founder, Priya, already hunched over her laptop. \u201cI\u2019ve been here since 6 a.m.,\u201d she announced, eyes locked on the screen. \u201cC++ is driving me nuts. We need a better GUI for the prototype or nobody\u2019s going to take us seriously.\u201d Priya was a software prodigy who\u2019d spent most of college moonlighting on random freelance gigs. She could code for twenty hours straight if she had to. Her dedication was borderline terrifying, but that was just what Marcus needed if they were going to compete in a city thrumming with similar upstarts. He tossed his jacket onto a chair."
+  },
+  {
+    "audio_file": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/audio/ch_1_90s_Founder_in_SF_2.mp3",
+    "text": "\u201cI\u2019ve got some ideas on how to incorporate Java,\u201d he said. \u201cHeard it\u2019s the hot new thing for web applications. Maybe we build a minimal version in C++ but layer some interactive web elements in Java? Then we can say we\u2019re riding that sweet, sweet internet wave when we pitch.\u201d Priya finally looked up from her screen, eyebrows arched. \u201cJava, huh? That\u2019s bold. But if it means we can snag some forward-thinking investors, I\u2019m all for it. Have you talked to any potential leads yet?\u201d Marcus grimaced. \u201cI\u2019ve got some local meetups on my schedule, plus a personal intro from my old professor at Stanford. He said a few of his ex-students\u2014now big-shot VCs\u2014are looking for new software plays. But they\u2019ll want to see something tangible first.\u201d Priya nodded. \u201cRight. A demonstration. Investors want results, or at least the promise of it. Let\u2019s make sure we\u2019re bulletproof for the next month. Right now, this prototype is duct tape and prayers.\u201d Marcus glanced at the blinking cursor on her screen. \u201cDuct tape can be mighty strong,\u201d he quipped. \u201cBut yeah, let\u2019s aim for something more stable.\u201d A Trip to the Past\u2014and the Future Between lines of code and hurried coffee runs, Marcus\u2019s mind wandered back to how he got here in the first place. Only a year ago, he\u2019d been in a university computer lab, surfing bulletin board systems (BBS) late into the night. He still remembered how the high-pitched screech of dial-up was both an annoyance and a promise\u2014the promise that one day, the world might be connected instantly, that you could beam your ideas everywhere like telepathy. As he wrote and rewrote functions in C, carefully scanning for memory leaks, he felt the weight of hardware constraints pressing on him like an anvil. RAM didn\u2019t come cheap, and software had to fit into the limited memory of a personal computer. One extraneous loop, and the performance would tank. This necessity for tight code, for elegant engineering, was simultaneously thrilling and aggravating. Once, his professor had said, \u201cComputers in the future might have so much memory that you won\u2019t even bother to optimize your loops.\u201d The class had erupted in laughter at the absurdity. But here in 1995, discarding efficiency was still unthinkable. Every cycle mattered\u2014and that gave Marcus a sense of discipline he was sure would serve him well in the years to come. Wheels in Motion That evening, when the clock struck ten and most of the building\u2019s lights dimmed, Marcus and Priya packed up to attend a local tech meetup. It was happening at a dimly lit bar near Union Square, where a back room had been co-opted by a group of scrappy entrepreneurs and engineers. The smell of stale beer and a thrumming bass line collided with the sight of laptops precariously perched on rickety tables. With a quick handshake at the door, they were in. Marcus recognized a few faces\u2014former classmates and acquaintances who were also building \u201cthe next big thing.\u201d They exchanged the usual pleasantries: \u201cWhat are you working on?\u201d and \u201cGot any funding yet?\u201d Mixed in with the networking swirl were genuine bursts of excitement. Someone had just landed a seed investment for a web-based email application. Another boasted about hooking up their entire office network to a T1 line\u2014unthinkably fast for the era. Priya slipped away to talk to a potential angel investor, while Marcus found himself cornered by a tall, bespectacled figure who introduced himself as Horace King, a magazine writer covering the local tech scene. Horace\u2019s eyes gleamed as he peppered Marcus with questions. \u201cWhat\u2019s your startup\u2019s angle? Web-based? Desktop? Are you taking on Microsoft or building something complementary to Windows 95?\u201d Marcus bristled at the mention of Microsoft. Though the tech giant dominated, mention of taking them head-on was a surefire way to get labeled as \u201cna\u00efve.\u201d Instead, he carefully framed his answer. \u201cWe\u2019re building a software platform that helps small businesses manage operations more efficiently,\u201d he said, carefully omitting the details of how. \u201cImagine hooking into the web for easier communication and data sharing. We want"
+  },
+  {
+    "audio_file": "/Users/kodykendall/SoftEngineering/story/90s_Founder_in_SF/audio/ch_1_90s_Founder_in_SF_3.mp3",
+    "text": "to be part of that movement.\u201d Horace\u2019s pencil scratched across a notepad. \u201cInteresting. Keep me updated. Tech is blowing up, and we\u2019re all looking for the next Netscape.\u201d Marcus forced a grin. The success of Netscape loomed large in everyone\u2019s mind, a prime example of a startup turned overnight superstar. But for every Netscape, there were dozens, maybe hundreds, of stalled dreamers who never got off the runway. Still, if you didn\u2019t try, you\u2019d never know. Midnight on the Horizon By the time Marcus and Priya left the meetup, midnight was close at hand. The fog was rolling in from the bay, curling around the streetlights and giving the city a haunted glow. The pair walked side by side, their breath misting in the cold air. \u201cYou know,\u201d Priya said, \u201csometimes I feel like we\u2019re chasing a mirage. Everyone wants to be the next big hit. It\u2019s exhilarating, but it\u2019s also\u2026 insane?\u201d Marcus nodded, tucking his hands deeper into his jacket pockets. \u201cIt is insane. But we\u2019re here at the ground floor. This feels like the frontier, and we get to shape it. Even if it\u2019s dangerous and uncertain, it\u2019s also where everything\u2019s happening.\u201d Priya offered a tired but determined smile. \u201cI\u2019ll take the risk if it means building something meaningful. Let\u2019s not forget\u2014no matter how crazy this city gets, or how big the hype becomes, we have a real product to deliver.\u201d Marcus looked up at the towering skyline, lights flickering in the haze. Every window he saw was someone else\u2019s story, someone else\u2019s ambition. But somewhere out there, he thought, was also their chance. Their software might end up in businesses across the country or maybe even worldwide. The possibilities dangled just out of reach, like fireworks waiting to be lit. \u201cTomorrow,\u201d he said, \u201cwe\u2019ll refine the prototype and test out that Java integration. And maybe, just maybe, we\u2019ll spark the fuse that sets everything off.\u201d With that, they turned a corner and vanished into the fog, bracing themselves for another day in a city that was fast becoming the launchpad for a digital revolution. The dial-up screech, the hum of the CPU, and the glimmer of big dreams\u2014they were all in perfect harmony here in mid-\u201990s San Francisco, and Marcus Stevens was determined to make the most of it."
+  }
+];
+
+        let currentAudioIndex = 0;
+        const audio = new Audio();
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateAudioInfo() {
+            const current = audio_paths[currentAudioIndex];
+            const title = `Part ${currentAudioIndex + 1} of ${audio_paths.length}`;
+            document.getElementById('audioTitle').textContent = title;
+            document.getElementById('audioText').textContent = current.text;
+        }
+
+        function updateSeekBar() {
+            const seekBar = document.getElementById('seekBar');
+            const currentTimeDisplay = document.getElementById('currentTime');
+            const durationDisplay = document.getElementById('duration');
+            
+            seekBar.value = (audio.currentTime / audio.duration) * 100 || 0;
+            currentTimeDisplay.textContent = formatTime(audio.currentTime);
+            durationDisplay.textContent = formatTime(audio.duration || 0);
+        }
+
+        // Add event listeners for audio
+        audio.addEventListener('timeupdate', updateSeekBar);
+        audio.addEventListener('loadedmetadata', updateSeekBar);
+
+        // Update seek bar functionality
+        document.getElementById('seekBar').addEventListener('input', function(e) {
+            const time = (audio.duration / 100) * e.target.value;
+            audio.currentTime = time;
+        });
+
+        function playAudio() {
+            audio.src = audio_paths[currentAudioIndex].audio_file;
+            audio.play().catch(e => console.error('Error playing audio:', e));
+            updateAudioInfo();
+            document.getElementById('toggleButton').textContent = 'Pause';
+        }
+
+        function nextAudio() {
+            if (currentAudioIndex < audio_paths.length - 1) {
+                currentAudioIndex++;
+                playAudio();
+            }
+        }
+
+        function previousAudio() {
+            if (currentAudioIndex > 0) {
+                currentAudioIndex--;
+                playAudio();
+            }
+        }
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+                document.getElementById('toggleButton').textContent = 'Pause';
+            } else {
+                audio.pause();
+                document.getElementById('toggleButton').textContent = 'Play';
+            }
+        }
+
+        // Combined initialization function
+        window.onload = function() {
+            updateImage();
+            updateAudioInfo();
+        };
+
+    </script>
+</body>
+</html>

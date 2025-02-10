@@ -2,7 +2,7 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 import json
-
+import requests
 class ImageGenerator:
     def __init__(self, api_key=None):
         load_dotenv()
@@ -35,16 +35,28 @@ if __name__ == "__main__":
     #     "style": "Antique, textured, sepia-toned"
     #   },
     
-    input_file_path = "Edward_Robert/images/ch_1_images.json"
-    output_file_path = "Edward_Robert/images/ch_1_images_with_urls.json"
+    chapter_number = 1
+    input_file_path = f"90s_Founder_in_SF/images/json/ch_{chapter_number}_images.json"
+    output_file_path = f"90s_Founder_in_SF/images/json/ch_{chapter_number}_images_with_urls.json"
     json_input = json.load(open(input_file_path))
     images = []
     
     for image in json_input["images"]:
         prompt = image["description"]
         image_url = generator.generate_image(prompt)
-        print(image_url)
-        image["image_url"] = image_url
+        
+        # Create the directory structure if it doesn't exist
+        image_dir = os.path.dirname(f"90s_Founder_in_SF/images/raw_images/ch_{chapter_number}_{image['chunkIndex']}.jpg")
+        os.makedirs(image_dir, exist_ok=True)
+        
+        # download the image and save it to the images folder
+        image_path = f"90s_Founder_in_SF/images/raw_images/ch_{chapter_number}_{image['chunkIndex']}.jpg"
+        response = requests.get(image_url)
+        with open(image_path, "wb") as f:
+            f.write(response.content)
+
+        print(image_path)
+        image["image_url"] = image_path
         images.append(image)
         
     json.dump(images, open(output_file_path, "w"))

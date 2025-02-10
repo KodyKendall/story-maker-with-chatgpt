@@ -2,6 +2,7 @@ from pathlib import Path
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
@@ -33,7 +34,7 @@ def chunk_text(text, max_chars):
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # Read input text from file
-input_file_path = "ch_0_Edward_Robert_American_Journey.txt"  # Replace with your text file path
+input_file_path = "90s_Founder_in_SF/txt/ch_1_90s_Founder_in_SF.txt"  # Replace with your text file path
 input_path = Path(input_file_path)
 base_name = input_path.stem  # Gets filename without extension
 
@@ -44,7 +45,8 @@ with open(input_file_path, 'r', encoding='utf-8') as file:
 # Split text into chunks
 text_chunks = chunk_text(input_text, MAX_CHARACTERS)
 
-# Create audio files for each chunk
+# Create audio files for each chunk and build JSON data
+json_data = []
 for i, chunk in enumerate(text_chunks):
     speech_file_path = Path(__file__).parent / f"{base_name}_{i+1}.mp3"
     response = client.audio.speech.create(
@@ -54,3 +56,15 @@ for i, chunk in enumerate(text_chunks):
     )
     response.stream_to_file(speech_file_path)
     print(f"Created: {speech_file_path}")
+    
+    # Add entry to JSON data
+    json_data.append({
+        "audio_file": str(speech_file_path),
+        "text": chunk
+    })
+
+# Write JSON data to file
+json_file_path = Path(__file__).parent / f"{base_name}_audio_mapping.json"
+with open(json_file_path, 'w', encoding='utf-8') as f:
+    json.dump(json_data, f, indent=2)
+print(f"Created JSON mapping file: {json_file_path}")

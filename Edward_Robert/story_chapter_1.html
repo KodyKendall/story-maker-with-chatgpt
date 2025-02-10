@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edward & Robert's Story</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .image-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px 0;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="title" id="title"></div>
+        <div class="description" id="description"></div>
+        <img id="storyImage" src="" alt="">
+        <div class="navigation">
+            <button onclick="previousImage()">Previous</button>
+            <button onclick="nextImage()">Next</button>
+        </div>
+        <div class="audio-controls">
+            <button onclick="previousAudio()">Previous Audio</button>
+            <button onclick="toggleAudio()" id="toggleButton">Play/Pause</button>
+            <button onclick="nextAudio()">Next Audio</button>
+        </div>
+    </div>
+
+    <script>
+        const images = 
+        [
+    {
+        "chunkIndex": 1,
+        "title": "Introduction: Harsh Realities of Jamestown",
+        "description": "An aged parchment letter set against a faded map of early Virginia. The image conveys a grim, historical tone that hints at the brutal survival struggles and hardships faced by the early settlers.",
+        "style": "Antique, textured, sepia-toned",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-S80qD4f3JFQlHLmmF5AM6j6H.png?st=2025-02-09T21%3A22%3A18Z&se=2025-02-09T23%3A22%3A18Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T11%3A52%3A45Z&ske=2025-02-10T11%3A52%3A45Z&sks=b&skv=2024-08-04&sig=4cOE5dlpC2A5TlSBXairRIkdau2VHGJDsM0U8JFL7Lw%3D"
+    },
+    {
+        "chunkIndex": 2,
+        "title": "Jamestown's Starving Time",
+        "description": "A bleak scene of a nearly abandoned Jamestown settlement with dilapidated structures and a handful of emaciated settlers. Visual cues such as improvised meals (rats, scraps, shoe leather) and shadowy hints of cannibalism subtly underline the desperation of the era.",
+        "style": "Realistic, muted colors, historical illustration",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-CoAU3LKvGkhK7T4vYqaN0ac3.png?st=2025-02-09T21%3A22%3A33Z&se=2025-02-09T23%3A22%3A33Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T12%3A15%3A16Z&ske=2025-02-10T12%3A15%3A16Z&sks=b&skv=2024-08-04&sig=PfxyED7nbltzktX/1EYk/E8YYlhfCQjIqIyWj9s7Xfw%3D"
+    },
+    {
+        "chunkIndex": 3,
+        "title": "Robert Wainwright's Desperate Plea",
+        "description": "A close-up of a stained parchment letter with rough, urgent handwriting. Superimposed in the background are ghostly, dramatic silhouettes of suffering colonists and symbols of hunger, fever, and conflict (such as arrows), evoking the dire tone of Robert\u2019s message.",
+        "style": "Dramatic, dark-toned, expressive",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-7kpXkGdVSgdcAPfBo0Noy05W.png?st=2025-02-09T21%3A22%3A51Z&se=2025-02-09T23%3A22%3A51Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T21%3A19%3A05Z&ske=2025-02-10T21%3A19%3A05Z&sks=b&skv=2024-08-04&sig=Li2j8e8yNEMTk51HD72fXD6SrZxmZLoyTKuOUbJb%2Bg4%3D"
+    },
+    {
+        "chunkIndex": 4,
+        "title": "Barter Over Coin: Survival Essentials",
+        "description": "An illustration contrasting scattered, nearly useless coins with a well-arranged display of tangible supplies: food items like corn and dried meats, essential tools, period weapons, clothing, and medicinal items. This visual emphasizes how survival depended on barter rather than currency in early Jamestown.",
+        "style": "Informative, cutaway diagram style with historical details",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-hqnNs9rtgqtXajiqA2cEx2KE.png?st=2025-02-09T21%3A23%3A06Z&se=2025-02-09T23%3A23%3A06Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T13%3A20%3A59Z&ske=2025-02-10T13%3A20%3A59Z&sks=b&skv=2024-08-04&sig=7wFlbKckSJV2CmAi/6m2P%2BJ4yI9E%2B0dm%2BQBrcfJZhQ0%3D"
+    },
+    {
+        "chunkIndex": 5,
+        "title": "The Harper Family's Dilemma",
+        "description": "A 17th-century London study scene where Edward reads Robert\u2019s letter with a concerned expression, while his two sons, Thomas (15) with a determined look and William (12) appearing frightened, react in the background. The setting, complete with period decor and soft, contrasting light, underscores the pivotal shift in their perception of America.",
+        "style": "Chiaroscuro, detailed, atmospheric",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-YWspcwjqjjKrq4ra0mL4f8ii.png?st=2025-02-09T21%3A23%3A20Z&se=2025-02-09T23%3A23%3A20Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T11%3A32%3A57Z&ske=2025-02-10T11%3A32%3A57Z&sks=b&skv=2024-08-04&sig=ecXCb98K3TVfalh2Kg%2BhQ6dU28eWIAjciWzIduoeb28%3D"
+    },
+    {
+        "chunkIndex": 6,
+        "title": "Crossroads of Fate",
+        "description": "A symbolic split-scene composition: one half depicts the turbulent, unforgiving landscape of Jamestown with stormy skies and rugged terrain, while the other half shows a reflective London interior with a family contemplating their future. A central, weathered letter and quill tie the two worlds together, symbolizing the critical decisions that will shape their fates.",
+        "style": "Symbolic, atmospheric, with a dual-scene composition",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-KE6Xv5MfyW3IggK3p6rephpq.png?st=2025-02-09T21%3A23%3A31Z&se=2025-02-09T23%3A23%3A31Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T12%3A37%3A25Z&ske=2025-02-10T12%3A37%3A25Z&sks=b&skv=2024-08-04&sig=BnDrqCq8jDspxS6o6Pfb1zsY%2BeM/F3CJfGQudIuzobk%3D"
+    }
+];
+
+        let currentIndex = 0;
+
+        function updateImage() {
+            const current = images[currentIndex];
+            document.getElementById('title').textContent = current.title;
+            document.getElementById('description').textContent = current.description;
+            document.getElementById('storyImage').src = current.image_url;
+        }
+
+        function nextImage() {
+            if (currentIndex < images.length - 1) {
+                currentIndex++;
+                updateImage();
+            }
+        }
+
+        function previousImage() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateImage();
+            }
+        }
+
+        // Load first image when page loads
+        window.onload = updateImage;
+
+        const mp3_paths = [
+            "./audio/ch_1_Edward_Robert_American_Journey_1.mp3",
+            "./audio/ch_1_Edward_Robert_American_Journey_2.mp3"
+        ];
+
+        let currentAudioIndex = 0;
+        const audio = new Audio();
+
+        // Add error handling for audio
+        audio.onerror = function() {
+            console.error('Error loading audio file:', audio.src);
+        };
+
+        function playAudio() {
+            audio.src = mp3_paths[currentAudioIndex];
+            audio.play().catch(e => console.error('Error playing audio:', e));
+        }
+
+        function nextAudio() {
+            if (currentAudioIndex < mp3_paths.length - 1) {
+                currentAudioIndex++;
+                audio.src = mp3_paths[currentAudioIndex];
+                audio.play();
+            }
+        }
+
+        function previousAudio() {
+            if (currentAudioIndex > 0) {
+                currentAudioIndex--;
+                audio.src = mp3_paths[currentAudioIndex];
+                audio.play();
+            }
+        }
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        // Combined initialization function
+        window.onload = function() {
+            updateImage();
+            playAudio();
+        };
+
+    </script>
+</body>
+</html>

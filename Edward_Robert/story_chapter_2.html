@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edward & Robert's Story</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .image-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px 0;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="title" id="title"></div>
+        <div class="description" id="description"></div>
+        <img id="storyImage" src="" alt="">
+        <div class="navigation">
+            <button onclick="previousImage()">Previous</button>
+            <button onclick="nextImage()">Next</button>
+        </div>
+        <div class="audio-controls">
+            <button onclick="previousAudio()">Previous Audio</button>
+            <button onclick="toggleAudio()" id="toggleButton">Play/Pause</button>
+            <button onclick="nextAudio()">Next Audio</button>
+        </div>
+    </div>
+
+    <script>
+        const images = 
+        [
+    {
+        "chunkIndex": 1,
+        "title": "Family Tied by Letters",
+        "description": "A detailed illustration showing a dual scene: one half depicts a stately London with a respectable merchant family representing Edward\u2019s secure legacy, while the other half portrays the rugged Virginia frontier where Robert and Thomas struggle. Intertwined between them are floating parchment letters, symbolizing the connection and emotional tension of living between two worlds.",
+        "style": "Historical painting style with rich, earthy tones and soft, evocative lighting.",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-y4c3HGtEUXKZAt32vZAsQQsf.png?st=2025-02-09T21%3A36%3A12Z&se=2025-02-09T23%3A36%3A12Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T00%3A00%3A32Z&ske=2025-02-10T00%3A00%3A32Z&sks=b&skv=2024-08-04&sig=DiERHKl2fxSMXpJq3djJXg8vboijEfPLkwpJG5zTRj8%3D"
+    },
+    {
+        "chunkIndex": 2,
+        "title": "Supply Voyage and Contract",
+        "description": "An engaging maritime scene featuring a supply ship laden with dried food, tools, and fabric departing from London. In the foreground, capture Edward negotiating a contract with Robert, whose silhouette reflects both desperation and gratitude. A wintery setting hints at the perilous journey and Robert\u2019s 1611 letter of thanks.",
+        "style": "Realistic with historical detail and a dramatic, wintry atmosphere.",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-W1Azh7KMco12xuduHgVTTh0z.png?st=2025-02-09T21%3A36%3A27Z&se=2025-02-09T23%3A36%3A27Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T14%3A29%3A35Z&ske=2025-02-10T14%3A29%3A35Z&sks=b&skv=2024-08-04&sig=Wi/dLpQ8H7wOdqqnro6fgtx8WXojyO2ueOY8%2BeyHDzA%3D"
+    },
+    {
+        "chunkIndex": 3,
+        "title": "Virginia's Early Opportunity",
+        "description": "A dynamic depiction of early 17th-century Virginia showing a newly freed Robert working on a small plot of fertile land amidst budding tobacco fields. Include subtle elements of colonial governance and Native American trade, with floating handwritten letters that evoke themes of adventure, struggle, and change from the 1614 correspondence.",
+        "style": "Vibrant, semi-realistic with authentic period details and lively color accents.",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-TVWcLdOv4XQL2rdJ0RlZrLtC.png?st=2025-02-09T21%3A36%3A43Z&se=2025-02-09T23%3A36%3A43Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T18%3A24%3A18Z&ske=2025-02-10T18%3A24%3A18Z&sks=b&skv=2024-08-04&sig=Y/uE437XgqH2lPzqfez3IrOmkgcRhdJesAXYS88AgfU%3D"
+    },
+    {
+        "chunkIndex": 4,
+        "title": "Trapped Dreams vs. Distant Adventure",
+        "description": "A split-scene composition highlighting the conflict between security and longing for adventure. On one side, depict a refined London setting with Edward overseeing a stable family life; on the other, show a restless Thomas, symbolized by a caged bird, gazing longingly toward a distant ship on the horizon, representing Virginia\u2019s wild promise.",
+        "style": "Moody and contrasting, using warm and cool tones to emphasize internal conflict.",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-J2OZiPbIf0i0hBYxhgruEj8Y.png?st=2025-02-09T21%3A36%3A58Z&se=2025-02-09T23%3A36%3A58Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T14%3A28%3A44Z&ske=2025-02-10T14%3A28%3A44Z&sks=b&skv=2024-08-04&sig=gig%2BMYNfv08pfsMior8RYHOmqIGYp%2B4qS4SsaLOsQiE%3D"
+    },
+    {
+        "chunkIndex": 5,
+        "title": "Growing Family Divide",
+        "description": "A somber illustration capturing the widening rift in the Harper family during 1621-1625. Feature a rugged, weathered Robert set against a backdrop of Virginia\u2019s booming yet violent frontier and, in a contrasting inset, a worried, aging Edward in a London study surrounded by maps and letters. Centered is Thomas, depicted as torn between two worlds.",
+        "style": "Dramatic chiaroscuro with realistic textures that evoke tension and the passage of time.",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-Me7Zh2ZGKmJijxGj9aYtX5ZH.png?st=2025-02-09T21%3A37%3A11Z&se=2025-02-09T23%3A37%3A11Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T14%3A57%3A24Z&ske=2025-02-10T14%3A57%3A24Z&sks=b&skv=2024-08-04&sig=xgt3OCHM6na/ltRb/YkJpQKvGFOkKLSqaLhegwnElBE%3D"
+    },
+    {
+        "chunkIndex": 6,
+        "title": "Thomas at the Crossroads",
+        "description": "A symbolic portrayal of Thomas at a literal crossroads: one path leads to an opulent London skyline representing security and tradition, while the other heads toward a rugged Virginia harbor with sailing ships that embody risk and adventure. Floating letters in the wind reinforce the legacy of family communication and the weight of destiny.",
+        "style": "Symbolic and painterly, with saturated colors blending realism and expressionism.",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-EQD9HH8eVa9hQQtMUuiEGGi8.png?st=2025-02-09T21%3A37%3A23Z&se=2025-02-09T23%3A37%3A23Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T13%3A34%3A01Z&ske=2025-02-10T13%3A34%3A01Z&sks=b&skv=2024-08-04&sig=GIunNW83rKSQ2LNFvx7mZkcrE7Iko6bq0HCrZoY70T4%3D"
+    },
+    {
+        "chunkIndex": 7,
+        "title": "Legacy of Letters and Decisions",
+        "description": "An evocative montage combining elements such as aged parchment letters, quill pens, family crests, and antique maps, overlaid on a backdrop that merges scenes of London and Virginia. This image encapsulates the enduring power of written communication to bridge worlds and shape destinies, reflecting on the scenario's realistic portrayal of family and legacy.",
+        "style": "Nostalgic, soft-focus, with vintage tones reminiscent of old family albums.",
+        "image_url": "https://oaidalleapiprodscus.blob.core.windows.net/private/org-DDnd9JZzK5nI5MnwpZ9vmoFn/user-gNVD933o2MnPv7mzS5gkAmHy/img-7g7DpTwaTC4MHMfSCZHpFIGk.png?st=2025-02-09T21%3A37%3A36Z&se=2025-02-09T23%3A37%3A36Z&sp=r&sv=2024-08-04&sr=b&rscd=inline&rsct=image/png&skoid=d505667d-d6c1-4a0a-bac7-5c84a87759f8&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-02-09T22%3A16%3A44Z&ske=2025-02-10T22%3A16%3A44Z&sks=b&skv=2024-08-04&sig=V8f55oUg6w9BeYtHqDER6YjiT5nUYxJs2UOhTUB%2B6h0%3D"
+    }
+];
+
+        let currentIndex = 0;
+
+        function updateImage() {
+            const current = images[currentIndex];
+            document.getElementById('title').textContent = current.title;
+            document.getElementById('description').textContent = current.description;
+            document.getElementById('storyImage').src = current.image_url;
+        }
+
+        function nextImage() {
+            if (currentIndex < images.length - 1) {
+                currentIndex++;
+                updateImage();
+            }
+        }
+
+        function previousImage() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateImage();
+            }
+        }
+
+        // Load first image when page loads
+        window.onload = updateImage;
+
+        const mp3_paths = [
+            "./audio/ch_2_Edward_Robert_American_Journey_1.mp3",
+            "./audio/ch_2_Edward_Robert_American_Journey_2.mp3"
+        ];
+
+        let currentAudioIndex = 0;
+        const audio = new Audio();
+
+        // Add error handling for audio
+        audio.onerror = function() {
+            console.error('Error loading audio file:', audio.src);
+        };
+
+        function playAudio() {
+            audio.src = mp3_paths[currentAudioIndex];
+            audio.play().catch(e => console.error('Error playing audio:', e));
+        }
+
+        function nextAudio() {
+            if (currentAudioIndex < mp3_paths.length - 1) {
+                currentAudioIndex++;
+                audio.src = mp3_paths[currentAudioIndex];
+                audio.play();
+            }
+        }
+
+        function previousAudio() {
+            if (currentAudioIndex > 0) {
+                currentAudioIndex--;
+                audio.src = mp3_paths[currentAudioIndex];
+                audio.play();
+            }
+        }
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        // Combined initialization function
+        window.onload = function() {
+            updateImage();
+            playAudio();
+        };
+
+    </script>
+</body>
+</html>
