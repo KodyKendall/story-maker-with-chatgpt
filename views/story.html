@@ -106,8 +106,8 @@
 
     <script>
     // Load data from server-side template
-    const images = {{ images | tojson }};
-    const audio_paths = {{ audio_paths | tojson }};
+    const images = {{ images | tojson | safe }};
+    const audio_paths = {{ audio_paths | tojson | safe }};
     
     let currentIndex = 0;
     let currentAudioIndex = 0;
@@ -117,7 +117,8 @@
         const current = images[currentIndex];
         document.getElementById('title').textContent = current.title;
         document.getElementById('description').textContent = current.description;
-        document.getElementById('storyImage').src = current.image_url;
+        const filename = current.image_url.split('/').pop();
+        document.getElementById('storyImage').src = `/images/${filename}`;
     }
 
     function nextImage() {

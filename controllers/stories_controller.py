@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import FileResponse
 import os
 import json
 from datetime import date
@@ -44,6 +45,7 @@ async def stories(request: Request):
 
 @router.get("/story")
 async def story(request: Request, filepath: str):
+    root_directory = os.path.dirname(os.path.dirname(__file__))  # Go up two levels to reach project root
     try:
         # Validate filepath exists
         if not os.path.exists(filepath):
@@ -61,10 +63,10 @@ async def story(request: Request, filepath: str):
             
         # Make paths relative to static directory
         for image in images_data:
-            image["image_url"] = os.path.join("/static", filepath, "images", "raw_images", os.path.basename(image["image_url"]))
+            image["image_url"] = os.path.join(root_directory, filepath, "images", "raw_images", os.path.basename(image["image_url"]))
             
         for audio in audio_data:
-            audio["audio_file"] = os.path.join("/static", filepath, "audio", os.path.basename(audio["audio_file"]))
+            audio["audio_file"] = os.path.join(root_directory, filepath, "audio", os.path.basename(audio["audio_file"]))
 
         return templates.TemplateResponse(
             "story.html",
@@ -77,3 +79,14 @@ async def story(request: Request, filepath: str):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/images/{filename}")
+async def serve_story_image(filename: str):
+    # Build the path to the image
+    # Note: You might want to make this more dynamic based on the current story
+    image_path = os.path.join('stories', '90s_Founder_in_SF', 'images', 'raw_images', filename)
+    
+    if not os.path.exists(image_path):
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    return FileResponse(image_path)
