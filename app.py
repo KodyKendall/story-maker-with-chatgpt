@@ -139,10 +139,33 @@ async def get_period(period_id: str):
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Historical data not found")
 
-@app.get("/letters", response_model=List[Letter])
-async def get_all_letters():
-    try:
-        with open("data/letters.json", "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Letters not found")
+@app.get("/chapter1")
+async def chapter1(request: Request):
+    # Keep the file paths as they are in your original HTML
+    images = [
+        {
+            "chunkIndex": 1,
+            "title": "San Francisco Contrasts",
+            "description": "An expansive view of 1995 San Francisco's urban landscape...",
+            "style": "Vivid, cinematic with a nostalgic tone",
+            "image_url": "/90s_Founder_in_SF/images/raw_images/ch_1_1.jpg"
+        },
+        # ... rest of images ...
+    ]
+    
+    audio_paths = [
+        {
+            "audio_file": "/90s_Founder_in_SF/audio/ch_1_90s_Founder_in_SF_1.mp3",
+            "text": "Chapter 1: Silicon Dreams and Skyscrapers..."
+        },
+        # ... rest of audio paths ...
+    ]
+    
+    return templates.TemplateResponse(
+        "story_chapter_1.html",
+        {
+            "request": request,
+            "images": images,
+            "audio_paths": audio_paths
+        }
+    )

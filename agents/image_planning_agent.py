@@ -3,6 +3,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import json
 import requests
+
 class ImageGenerator:
     def __init__(self, api_key=None):
         load_dotenv()
@@ -49,7 +50,7 @@ if __name__ == "__main__":
         image_dir = os.path.dirname(f"90s_Founder_in_SF/images/raw_images/ch_{chapter_number}_{image['chunkIndex']}.jpg")
         os.makedirs(image_dir, exist_ok=True)
         
-        # download the image and save it to the images folder
+        # download the image and save it to the images folder (necessary because the link will eventually expire)
         image_path = f"90s_Founder_in_SF/images/raw_images/ch_{chapter_number}_{image['chunkIndex']}.jpg"
         response = requests.get(image_url)
         with open(image_path, "wb") as f:
