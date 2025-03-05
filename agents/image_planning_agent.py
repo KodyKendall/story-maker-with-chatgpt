@@ -3,8 +3,9 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import json
 import requests
-
-class ImageGenerator:
+from base_agent import BaseAgent
+#Outputs a JSON file that maps content to image descriptions, in order to plan out the images for the story.
+class ImagePlanningAgent:
     def __init__(self, api_key=None):
         load_dotenv()
         self.client = OpenAI(api_key=api_key or os.getenv("OPENAI_API_KEY"))
@@ -24,7 +25,7 @@ class ImageGenerator:
 
 if __name__ == "__main__":
     # main()
-    generator = ImageGenerator()
+    agent = ImagePlanningAgent()
     
     #Load a JSON file with the following JSON output
     # {
@@ -44,7 +45,7 @@ if __name__ == "__main__":
     
     for image in json_input["images"]:
         prompt = image["description"]
-        image_url = generator.generate_image(prompt)
+        image_url = agent.generate_image(prompt)
         
         # Create the directory structure if it doesn't exist
         image_dir = os.path.dirname(f"90s_Founder_in_SF/images/raw_images/ch_{chapter_number}_{image['chunkIndex']}.jpg")
