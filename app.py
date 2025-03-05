@@ -11,11 +11,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import json
 
-
-
 load_dotenv()
-
-
 
 app = FastAPI(
     title="Text to Speech Converter",
@@ -24,7 +20,7 @@ app = FastAPI(
 )
 
 # Set up templates and static files
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="views")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Initialize OpenAI client
@@ -54,41 +50,12 @@ def chunk_text(text, max_chars):
     
     return chunks
 
-@app.get("/")
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+# Import controllers (not views)
+from controllers import home_controller, audio_controller
 
-@app.post("/generate-audio")
-async def generate_audio(text: str = Form(...)):
-    if not text:
-        return {"error": "No text provided"}
-    
-    try:
-        # Create output directory if it doesn't exist
-        output_dir = Path("static/audio")
-        output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Generate unique filename
-        filename = f"speech_{uuid.uuid4()}.mp3"
-        speech_file_path = output_dir / filename
-        
-        # Split text into chunks if necessary
-        text_chunks = chunk_text(text, MAX_CHARACTERS)
-        
-        # For simplicity, we'll just use the first chunk
-        # You might want to handle multiple chunks differently
-        response = client.audio.speech.create(
-            model="tts-1",
-            voice="onyx",
-            input=text_chunks[0],
-        )
-        
-        response.stream_to_file(speech_file_path)
-        
-        return {"audio_url": f"/static/audio/{filename}"}
-    
-    except Exception as e:
-        return {"error": str(e)}
+# Include routers
+app.include_router(home_controller.router)
+app.include_router(audio_controller.router)
 
 app = FastAPI(
     title="Harper Family History API",
