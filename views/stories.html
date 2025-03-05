@@ -7,7 +7,7 @@
     {% if stories %}
         {% for story in stories %}
             <article class="story">
-                <h2>{{ story.title }}</h2>
+                <h2><a href="/story?filepath={{ story.filepath }}">{{ story.title }}</a></h2>
                 <div class="story-meta">
                     <span class="author">By {{ story.author }}</span>
                     <span class="date">{{ story.date }}</span>

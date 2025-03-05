@@ -29,7 +29,8 @@ async def stories(request: Request):
                         "title": story_folder,
                         "author": "Kody",
                         "date": date.today().strftime("%Y-%m-%d"),
-                        "content": content
+                        "content": content,
+                        "filepath": folder_path  # Store the story's root folder path
                     })
 
     return templates.TemplateResponse(
