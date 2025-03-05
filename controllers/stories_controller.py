@@ -63,10 +63,10 @@ async def story(request: Request, filepath: str):
             
         # Make paths relative to static directory
         for image in images_data:
-            image["image_url"] = os.path.join(root_directory, filepath, "images", "raw_images", os.path.basename(image["image_url"]))
+            image["image_url"] = os.path.basename(image["image_url"])
             
         for audio in audio_data:
-            audio["audio_file"] = os.path.join(root_directory, filepath, "audio", os.path.basename(audio["audio_file"]))
+            audio["audio_file"] = os.path.basename(audio["audio_file"])
 
         return templates.TemplateResponse(
             "story.html",
@@ -84,9 +84,21 @@ async def story(request: Request, filepath: str):
 async def serve_story_image(filename: str):
     # Build the path to the image
     # Note: You might want to make this more dynamic based on the current story
-    image_path = os.path.join('stories', '90s_Founder_in_SF', 'images', 'raw_images', filename)
+    image_path = os.path.join(filename)
     
     if not os.path.exists(image_path):
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    return FileResponse(image_path)
+
+@router.get("/audio/{filename}")
+async def serve_story_audio(filename: str):
+    # Build the path to the image
+    # Note: You might want to make this more dynamic based on the current story
+    breakpoint()
+    audio_path = os.path.join(filename)
+    
+    if not os.path.exists(audio_path):
         raise HTTPException(status_code=404, detail="Image not found")
     
     return FileResponse(image_path)

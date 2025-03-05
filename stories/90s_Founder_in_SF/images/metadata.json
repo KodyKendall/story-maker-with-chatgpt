@@ -4,55 +4,55 @@
         "title": "San Francisco Contrasts",
         "description": "An expansive view of 1995 San Francisco\u2019s urban landscape, featuring steep streets with clattering cable cars juxtaposed against cracked sidewalks and glittering skyscrapers. This image should capture the tension between the city\u2019s aging infrastructure and its grand, ambitious skyline.",
         "style": "Vivid, cinematic with a nostalgic tone",
-        "image_url": "/Users/kodykendall/SoftEngineering/story/stories/90s_Founder_in_SF/images/raw_images/ch_1_1.jpg"
+        "image_url": "raw_images/ch_1_1.jpg"
     },
     {
         "chunkIndex": 2,
         "title": "Tech Beginnings in a Cramped Room",
         "description": "A detailed depiction of Marcus Stevens in his cramped bedroom-turned-office. The scene shows him surrounded by tangled cables, a bulky US Robotics 28.8K modem, and a glowing CRT monitor casting an eerie blue light on his face as he eagerly awaits his modem\u2019s connection.",
         "style": "Retro 90s tech aesthetic with warm yet muted lighting",
-        "image_url": "/Users/kodykendall/SoftEngineering/story/stories/90s_Founder_in_SF/images/raw_images/ch_1_2.jpg"
+        "image_url": "raw_images/ch_1_2.jpg"
     },
     {
         "chunkIndex": 3,
         "title": "A City of Contrasts",
         "description": "An image of Marcus stepping out into the vibrant streets of the Mission District. The scene should display an eclectic mix of architecture\u2014a rickety Victorian house beside a modern condo, an old bakery adjacent to a trendy pop-up caf\u00e9\u2014emphasizing the blend of old-world charm and modern energy.",
         "style": "Dynamic street photography style with rich urban details",
-        "image_url": "/Users/kodykendall/SoftEngineering/story/stories/90s_Founder_in_SF/images/raw_images/ch_1_3.jpg"
+        "image_url": "raw_images/ch_1_3.jpg"
     },
     {
         "chunkIndex": 4,
         "title": "The Shared Workspace",
         "description": "Illustrate the exterior and interior of an old warehouse building converted into a shared office space. Include large metal doors, a cluster of worn bicycles, and walls decorated with tech meetup posters in multiple languages, conveying a gritty yet hopeful startup atmosphere.",
         "style": "Realistic and grunge urban with a touch of industrial decay",
-        "image_url": "/Users/kodykendall/SoftEngineering/story/stories/90s_Founder_in_SF/images/raw_images/ch_1_4.jpg"
+        "image_url": "raw_images/ch_1_4.jpg"
     },
     {
         "chunkIndex": 5,
         "title": "The Loft That Never Slept",
         "description": "Inside a second-floor startup loft, show Marcus and his co-founder Priya deeply engaged in their work. The room should feature creaky wooden steps, scattered tech paraphernalia, a hint of lingering coffee and pizza smells, and computer screens displaying lines of code, capturing the midnight oil and raw energy of a 90s tech startup.",
         "style": "Gritty, retro-cyber aesthetic with warm, intimate lighting",
-        "image_url": "/Users/kodykendall/SoftEngineering/story/stories/90s_Founder_in_SF/images/raw_images/ch_1_5.jpg"
+        "image_url": "raw_images/ch_1_5.jpg"
     },
     {
         "chunkIndex": 6,
         "title": "From Dial-Up to the Future",
         "description": "Create a split-scene montage that juxtaposes a nostalgic college computer lab with bulky PCs and an iconic dial-up modem against an abstract vision of a futuristic, interconnected digital world. This image should symbolize the leap from constrained, efficient coding to a boundless digital revolution.",
         "style": "Surreal, with a blend of muted nostalgic elements and vibrant futuristic cues",
-        "image_url": "/Users/kodykendall/SoftEngineering/story/stories/90s_Founder_in_SF/images/raw_images/ch_1_6.jpg"
+        "image_url": "raw_images/ch_1_6.jpg"
     },
     {
         "chunkIndex": 7,
         "title": "Tech Meetup Energy",
         "description": "Depict a dimly lit bar near Union Square transformed into an impromptu tech meetup venue. Capture scrappy entrepreneurs at rickety tables, laptops open amidst scattered notes, and a probing magazine writer in the background, all set against the backdrop of stale beer and raw, vibrant ambition.",
         "style": "Noir-inspired with a vintage film feel and atmospheric shadows",
-        "image_url": "/Users/kodykendall/SoftEngineering/story/stories/90s_Founder_in_SF/images/raw_images/ch_1_7.jpg"
+        "image_url": "raw_images/ch_1_7.jpg"
     },
     {
         "chunkIndex": 8,
         "title": "Midnight in the Fog",
         "description": "Show Marcus and Priya walking side-by-side through a fog-enshrouded San Francisco night. The image should include rolling fog, diffused streetlights, and a distant city skyline, embodying the mix of danger, uncertainty, and the infinite possibilities of their tech journey.",
         "style": "Moody, cinematic, and atmospheric with a focus on silhouettes and soft glows",
-        "image_url": "/Users/kodykendall/SoftEngineering/story/stories/90s_Founder_in_SF/images/raw_images/ch_1_8.jpg"
+        "image_url": "raw_images/ch_1_8.jpg"
     }
 ]
