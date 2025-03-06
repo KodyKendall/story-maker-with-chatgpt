@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edward & Robert's Story</title>
+    <title>Edward & Robert's Storysss</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -108,6 +108,8 @@
     // Load data from server-side template
     const images = {{ images | tojson | safe }};
     const audio_paths = {{ audio_paths | tojson | safe }};
+    console.log('images:', images);
+    console.log('audio_paths:', audio_paths);
     
     let currentIndex = 0;
     let currentAudioIndex = 0;

@@ -80,6 +80,14 @@ async def story(request: Request, filepath: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/stories/{story_name}/{filename}")
+async def serve_story_asset(story_name: str, filename: str):
+    root_directory = os.path.dirname(os.path.dirname(__file__))  # Go up two levels to reach project root
+    full_path = os.path.join(root_directory, story_name, filename)
+
+    file_path = os.path.join(full_path)
+    breakpoint()
+
 @router.get("/images/{filename}")
 async def serve_story_image(filename: str):
     # Build the path to the image
