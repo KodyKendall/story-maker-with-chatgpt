@@ -3,7 +3,7 @@ from langgraph.graph import StateGraph, MessagesState
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI  # Replace langchain_anthropic import
 
-from typing import TypedDict, Literal, List
+from typing import TypedDict, Literal, List, Optional
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import BaseMessage
 from dotenv import load_dotenv
@@ -14,12 +14,12 @@ load_dotenv()
 # Define the state
 class WorkflowState(TypedDict):
     user_prompt: str                              # The user prompt describing the story to be written
-    outline: List[str]                            # A list of chapter outlines
-    chapters: List[str]                           # A list of fully written chapters
-    current_chapter_index: int                    # Tracks which chapter we are currently writing
-    final_story: str                              # Combined text of all chapters
-    messages: List["BaseMessage"]                 # Placeholder for conversation messages if needed
-    model_name: str                               # Which model to call
+    model_name: Optional[str]                     # Which model to call (optional)
+    outline: Optional[List[str]]                  # A list of chapter outlines (optional)
+    chapters: Optional[List[str]]                 # A list of fully written chapters (optional)
+    current_chapter_index: Optional[int]          # Tracks which chapter we are currently writing (optional)
+    final_story: Optional[str]                    # Combined text of all chapters (optional)
+    messages: Optional[List["BaseMessage"]]       # Placeholder for conversation messages if needed (optional)
 
 # Define the config
 class GraphConfig(TypedDict):
@@ -64,10 +64,10 @@ def chapter_outline_node(state: WorkflowState) -> WorkflowState:
     prompt = (
         f"Create a book outline with 10 chapters, with brief descriptions of each chapter based on the user prompt:\n"
         f"---\n"
-        f"{state['user_prompt']}\n"
+        f"{state.get('user_prompt', '')}\n"
         f"---\n"
     )
-    model_response = call_model(prompt, state["model_name"])
+    model_response = call_model(prompt, state.get("model_name", "anthropic"))
 
     # For simplicity, let's assume the model returns an outline, with each line as a separate chapter.
     # You'd parse the response as needed in a real setting.
@@ -86,13 +86,13 @@ def chapter_implementation_node(state: WorkflowState) -> WorkflowState:
     2. Append the result to state["chapters"].
     3. If more chapters remain, loop back to this node; otherwise, finalize the story.
     """
-    outline = state["outline"]
-    idx = state["current_chapter_index"]
+    outline = state.get("outline", [])
+    idx = state.get("current_chapter_index", 0)
 
     # If we've written all chapters, go to "finalize" by skipping any new writing.
     if idx >= len(outline):
         # Combine all chapters to form the final story
-        state["final_story"] = "\n\n".join(state["chapters"])
+        state["final_story"] = "\n\n".join(state.get("chapters", []))
         return state  # Moves on
 
     # Write the next chapter
@@ -101,10 +101,10 @@ def chapter_implementation_node(state: WorkflowState) -> WorkflowState:
         f"Write a full, detailed chapter using the outline item:\n"
         f"\"{chapter_title_or_description}\"\n\n"
         f"Consider the chapters written so far:\n"
-        f"{state['chapters']}\n"
+        f"{state.get('chapters', [])}\n"
         f"---\n"
     )
-    chapter_text = call_model(prompt, state["model_name"])
+    chapter_text = call_model(prompt, state.get("model_name", "anthropic"))
 
     # Store the newly written chapter
     state["chapters"].append(chapter_text)
@@ -134,10 +134,10 @@ def build_workflow():
     
     # Define conditions as separate functions
     def more_chapters_condition(state):
-        return state["current_chapter_index"] < len(state["outline"])
+        return state.get("current_chapter_index", 0) < len(state.get("outline", []))
         
     def all_chapters_done_condition(state):
-        return state["current_chapter_index"] >= len(state["outline"])
+        return state.get("current_chapter_index", 0) >= len(state.get("outline", []))
     
     # Chapters -> Chapters (loop back)
     workflow.add_conditional_edges(
