@@ -34,7 +34,7 @@ def chunk_text(text, max_chars):
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # Read input text from file
-input_file_path = "Essays/entrepreneurship_and_tech.txt"  # Replace with your text file path
+input_file_path = "stories/Kestrel/kestrel.txt"  # Replace with your text file path
 input_path = Path(input_file_path)
 base_name = input_path.stem  # Gets filename without extension
 
@@ -50,8 +50,10 @@ json_data = []
 for i, chunk in enumerate(text_chunks):
     speech_file_path = Path(__file__).parent / f"{base_name}_{i+1}.mp3"
     response = client.audio.speech.create(
-        model="tts-1",
-        voice="onyx",
+        model="tts-1-hd",
+        # voice="onyx",
+        # voice="sage",
+        voice="ash", #adventerous
         input=chunk,
     )
     response.stream_to_file(speech_file_path)
@@ -67,4 +69,5 @@ for i, chunk in enumerate(text_chunks):
 json_file_path = Path(__file__).parent / f"{base_name}_audio_mapping.json"
 with open(json_file_path, 'w', encoding='utf-8') as f:
     json.dump(json_data, f, indent=2)
+
 print(f"Created JSON mapping file: {json_file_path}")
