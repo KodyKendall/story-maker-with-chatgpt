@@ -6,6 +6,10 @@ from langchain_openai import ChatOpenAI  # Replace langchain_anthropic import
 from typing import TypedDict, Literal, List
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import BaseMessage
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Define the state
 class WorkflowState(TypedDict):
@@ -26,8 +30,30 @@ def call_model(prompt: str, model_name: str) -> str:
     This is a mock model-calling function. In practice, you'd implement your
     actual call to Anthropic/OpenAI or any other LLM.
     """
-    # Example simple logic for demonstration:
-    return f"Model({model_name}) response to: {prompt}"
+    if model_name == "anthropic":
+        claude_client = ChatAnthropic(
+            api_key=os.getenv("ANTHROPIC_API_KEY"),
+            model_name="claude-3-5-sonnet-20240620"  # Add a default model name
+        )
+        try:
+            response = claude_client.invoke(prompt)
+            return response.content[0].text if isinstance(response.content, list) else response.content
+        except Exception as e:
+            print(f"Error in get_claude_response: {str(e)}")
+            raise
+    elif model_name == "openai":
+        openai_client = ChatOpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            model_name="gpt-4o"  # Add a default model name for OpenAI
+        )
+        try:
+            response = openai_client.invoke(prompt)
+            return response.content[0].text if isinstance(response.content, list) else response.content
+        except Exception as e:
+            print(f"Error in get_openai_response: {str(e)}")
+            raise
+    else:
+        raise ValueError(f"Unsupported model_name: {model_name}")
 
 def chapter_outline_node(state: WorkflowState) -> WorkflowState:
     """
