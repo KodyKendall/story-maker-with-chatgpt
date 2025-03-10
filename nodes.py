@@ -88,29 +88,38 @@ def chapter_implementation_node(state: WorkflowState) -> WorkflowState:
     """
     outline = state.get("outline", [])
     idx = state.get("current_chapter_index", 0)
-
-    # If we've written all chapters, go to "finalize" by skipping any new writing.
-    if idx >= len(outline):
-        # Combine all chapters to form the final story
-        state["final_story"] = "\n\n".join(state.get("chapters", []))
-        return state  # Moves on
-
-    # Write the next chapter
+    
+    # Safety check - ensure we have an outline
+    if not outline:
+        print("Warning: No outline found in state")
+        state["final_story"] = "No outline was generated."
+        return state
+        
+    print(f"Processing chapter {idx+1}/{len(outline)}")
+    
+    # Write the next chapter based on its outline
     chapter_title_or_description = outline[idx]
     prompt = (
-        f"Write a full, detailed chapter using the outline item:\n"
+        f"Write chapter {idx+1} based on this outline:\n"
         f"\"{chapter_title_or_description}\"\n\n"
-        f"Consider the chapters written so far:\n"
-        f"{state.get('chapters', [])}\n"
-        f"---\n"
+        f"Make this a complete, engaging chapter that advances the story."
     )
+    
     chapter_text = call_model(prompt, state.get("model_name", "anthropic"))
-
+    
     # Store the newly written chapter
-    state["chapters"].append(chapter_text)
-    state["current_chapter_index"] += 1
-
-    # Decide next node: we can come back to chapter_implementation_node if more chapters are left
+    chapters = state.get("chapters", [])
+    chapters.append(f"Chapter {idx+1}: {chapter_text}")
+    state["chapters"] = chapters
+    
+    # Update the index for the next chapter
+    state["current_chapter_index"] = idx + 1
+    
+    # If we've finished all chapters, compile the final story
+    if state["current_chapter_index"] >= len(outline):
+        print(f"All {len(outline)} chapters complete. Finalizing story.")
+        state["final_story"] = "\n\n".join(state["chapters"])
+    
     return state
 
 def build_workflow():
@@ -122,29 +131,38 @@ def build_workflow():
     """
     workflow = StateGraph(WorkflowState)
 
-    # Add nodes - use different names to avoid conflict with state keys
+    # Add nodes
     workflow.add_node("create_outline", chapter_outline_node)
     workflow.add_node("write_chapters", chapter_implementation_node)
 
     # Set entry point
     workflow.set_entry_point("create_outline")
 
-    # Outline -> Chapters
+    # Connect outline to first chapter
     workflow.add_edge("create_outline", "write_chapters")
+    workflow.add_edge("write_chapters", "write_chapters")
     
-    # Define conditions as separate functions
-    def more_chapters_condition(state):
-        return state.get("current_chapter_index", 0) < len(state.get("outline", []))
-        
-    def all_chapters_done_condition(state):
-        return state.get("current_chapter_index", 0) >= len(state.get("outline", []))
+    # Define more explicit conditional logic
+    def more_chapters_needed(state):
+        idx = state.get("current_chapter_index", 0)
+        outline = state.get("outline", [])
+        result = idx < len(outline)
+        print(f"More chapters needed? {result} (current: {idx}, total: {len(outline)})")
+        return result
     
-    # Chapters -> Chapters (loop back)
+    def all_chapters_complete(state):
+        idx = state.get("current_chapter_index", 0)
+        outline = state.get("outline", [])
+        result = idx >= len(outline)
+        print(f"All chapters complete? {result} (current: {idx}, total: {len(outline)})")
+        return result
+    
+    # Add conditional edges with named functions for better debugging
     workflow.add_conditional_edges(
         "write_chapters",
         {
-            "write_chapters": more_chapters_condition,
-            END: all_chapters_done_condition
+            "write_chapters": more_chapters_needed,
+            END: all_chapters_complete
         }
     )
 
