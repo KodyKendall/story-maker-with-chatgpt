@@ -11,7 +11,7 @@ import os
 
 load_dotenv()
 
-NUM_CHAPTERS = 2
+NUM_CHAPTERS = 5
 
 # Define the state
 class WorkflowState(TypedDict):
@@ -46,8 +46,8 @@ def call_model(prompt: str, model_name: str) -> str:
     elif model_name == "openai":
         openai_client = ChatOpenAI(
             api_key=os.getenv("OPENAI_API_KEY"),
-            # model_name="o1"  # Add a default model name for OpenAI
-            model_name="gpt-4o"  # Add a default model name for OpenAI
+            model_name="o1"  # Add a default model name for OpenAI
+            # model_name="gpt-4o"  # Add a default model name for OpenAI
         )
         try:
             response = openai_client.invoke(prompt)
@@ -161,30 +161,21 @@ def build_workflow():
 
     # Connect outline to first chapter
     workflow.add_edge("create_outline", "write_chapters")
-    workflow.add_edge("write_chapters", "write_chapters")
-    workflow.add_edge("write_chapters", END)
-    # Define more explicit conditional logic
-    def more_chapters_needed(state):
-        idx = state.get("current_chapter_index", 0)
-        outline = state.get("outline", [])
-        result = idx < NUM_CHAPTERS
-        print(f"More chapters needed? {result} (current: {idx}, total: {NUM_CHAPTERS})")
-        return result
     
-    def all_chapters_complete(state):
+    # Define a single router function instead of two separate conditions
+    def chapter_router(state):
         idx = state.get("current_chapter_index", 0)
-        outline = state.get("outline", [])
-        result = idx >= NUM_CHAPTERS
-        print(f"All chapters complete? {result} (current: {idx}, total: {NUM_CHAPTERS})")
-        return result
+        if idx < NUM_CHAPTERS:
+            print(f"More chapters needed (current: {idx}, total: {NUM_CHAPTERS})")
+            return "write_chapters"
+        else:
+            print(f"All chapters complete (current: {idx}, total: {NUM_CHAPTERS})")
+            return END
     
-    # Add conditional edges with named functions for better debugging
+    # Add conditional edge with a single router function
     workflow.add_conditional_edges(
         "write_chapters",
-        {
-            "write_chapters": more_chapters_needed,
-            END: all_chapters_complete
-        }
+        chapter_router
     )
 
     # Compile the graph
