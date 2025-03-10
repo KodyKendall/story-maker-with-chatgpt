@@ -9,51 +9,141 @@ from langchain_core.messages import BaseMessage
 
 # Define the state
 class WorkflowState(TypedDict):
-    messages: List[BaseMessage]
+    user_prompt: str                              # The user prompt describing the story to be written
+    outline: List[str]                            # A list of chapter outlines
+    chapters: List[str]                           # A list of fully written chapters
+    current_chapter_index: int                    # Tracks which chapter we are currently writing
+    final_story: str                              # Combined text of all chapters
+    messages: List["BaseMessage"]                 # Placeholder for conversation messages if needed
+    model_name: str                               # Which model to call
 
 # Define the config
 class GraphConfig(TypedDict):
-    model_name: Literal["anthropic", "openai"]
+    model_name: Literal["anthropic", "openai"]    # Which model to call
 
-def call_model(state: WorkflowState, config: GraphConfig):
-    # Add model calling logic here
-    # For example:
-    if config["model_name"] == "anthropic":
-        model = ChatAnthropic()
-    else:
-        model = ChatOpenAI()
-    
-    # Process messages and return updated state
+def call_model(prompt: str, model_name: str) -> str:
+    """
+    This is a mock model-calling function. In practice, you'd implement your
+    actual call to Anthropic/OpenAI or any other LLM.
+    """
+    # Example simple logic for demonstration:
+    return f"Model({model_name}) response to: {prompt}"
+
+def chapter_outline_node(state: WorkflowState) -> WorkflowState:
+    """
+    1. Generate a chapter outline from the user's prompt.
+    2. Save that outline in the state.
+    """
+    # Call the LLM with a prompt to outline the story
+    prompt = (
+        f"Create a book outline with 10 chapters, with brief descriptions of each chapter based on the user prompt:\n"
+        f"---\n"
+        f"{state['user_prompt']}\n"
+        f"---\n"
+    )
+    model_response = call_model(prompt, state["model_name"])
+
+    # For simplicity, let's assume the model returns an outline, with each line as a separate chapter.
+    # You'd parse the response as needed in a real setting.
+    # Example mock parse:
+    outline_lines = model_response.splitlines()
+    # Save the outlines to state
+    state["outline"] = [line.strip() for line in outline_lines if line.strip()]
+    state["chapters"] = []
+    state["current_chapter_index"] = 0
+    state["final_story"] = ""
     return state
 
-def tool_node(state: WorkflowState):
-    # Add tool execution logic here
+def chapter_implementation_node(state: WorkflowState) -> WorkflowState:
+    """
+    1. Using the outline, write a chapter based on the current chapter index.
+    2. Append the result to state["chapters"].
+    3. If more chapters remain, loop back to this node; otherwise, finalize the story.
+    """
+    outline = state["outline"]
+    idx = state["current_chapter_index"]
+
+    # If we've written all chapters, go to "finalize" by skipping any new writing.
+    if idx >= len(outline):
+        # Combine all chapters to form the final story
+        state["final_story"] = "\n\n".join(state["chapters"])
+        return state  # Moves on
+
+    # Write the next chapter
+    chapter_title_or_description = outline[idx]
+    prompt = (
+        f"Write a full, detailed chapter using the outline item:\n"
+        f"\"{chapter_title_or_description}\"\n\n"
+        f"Consider the chapters written so far:\n"
+        f"{state['chapters']}\n"
+        f"---\n"
+    )
+    chapter_text = call_model(prompt, state["model_name"])
+
+    # Store the newly written chapter
+    state["chapters"].append(chapter_text)
+    state["current_chapter_index"] += 1
+
+    # Decide next node: we can come back to chapter_implementation_node if more chapters are left
     return state
 
-def build_workflow(config: GraphConfig):
-    # Create the graph
+def build_workflow():
+    """
+    Create a workflow with:
+    - an outline node
+    - a chapter writing node (looping until done)
+    - finalize
+    """
     workflow = StateGraph(WorkflowState)
-    
-    # Add nodes
-    workflow.add_node("agent", call_model)
-    workflow.add_node("action", tool_node)
-    
+
+    # Add nodes - use different names to avoid conflict with state keys
+    workflow.add_node("create_outline", chapter_outline_node)
+    workflow.add_node("write_chapters", chapter_implementation_node)
+
     # Set entry point
-    workflow.set_entry_point("agent")
+    workflow.set_entry_point("create_outline")
+
+    # Outline -> Chapters
+    workflow.add_edge("create_outline", "write_chapters")
     
-    # Add edges
-    workflow.add_edge("action", "agent")
+    # Define conditions as separate functions
+    def more_chapters_condition(state):
+        return state["current_chapter_index"] < len(state["outline"])
+        
+    def all_chapters_done_condition(state):
+        return state["current_chapter_index"] >= len(state["outline"])
     
+    # Chapters -> Chapters (loop back)
+    workflow.add_conditional_edges(
+        "write_chapters",
+        {
+            "write_chapters": more_chapters_condition,
+            END: all_chapters_done_condition
+        }
+    )
+
     # Compile the graph
     return workflow.compile()
 
 # To run the workflow:
 if __name__ == "__main__":
-    config = {"model_name": "anthropic"}  # or "openai"
-    graph = build_workflow(config)
-    
-    # Initialize state
-    initial_state = WorkflowState(messages=[])
-    
-    # Run the workflow
+    # Build the workflow (no config needed now)
+    graph = build_workflow()
+
+    # Initialize state with model_name directly in the state
+    initial_state = WorkflowState(
+        user_prompt="A sweeping fantasy epic about a wandering bard who uncovers an ancient secret that could change the kingdom forever.",
+        outline=[],
+        chapters=[],
+        current_chapter_index=0,
+        final_story="",
+        messages=[],
+        model_name="anthropic"  # Include model_name directly in state
+    )
+
+    # Run the workflow - no need to pass config anymore
     final_state = graph.invoke(initial_state)
+
+    # Print final story
+    print("\n--- FINAL STORY ---\n")
+    print(final_state["final_story"])
